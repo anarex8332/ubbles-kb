@@ -78,49 +78,48 @@
                     <div class="nav-title"><i class="fas fa-home"></i><a href="{% url 'knowledge:home' %}" title="На главную">Главная</a></div>
                 </div>
 
-                <div class="nav-section">
+                <div class="nav-section" id="sidebar-sections">
                     <div class="nav-title"><i class="fas fa-folder"></i> Разделы</div>
-                    <ul class="nav-list">
-                        {% for section in nav_sections %}
-                            <li class="nav-list-item">
-                                <div class="nav-section-row">
-                                    <a href="{% url 'knowledge:section_detail' section.slug %}" class="nav-link nav-link--section" 
-                                       data-slug="{{ section.slug }}" title="Раздел: {{ section.name }}">
-                                        <span class="nav-icon">{{ section.icon|default:'📁' }}</span>
-                                        {{ section.name }}
-                                    </a>
-                                    <button class="nav-chevron-btn" title="Развернуть/свернуть"><i class="fas fa-chevron-down"></i></button>
+                    {% for section in nav_sections %}
+                        <div class="section-wrapper" data-section="{{ section.slug }}">
+                            <!-- SECTION HEADER (clickable — toggles chevron) -->
+                            <div class="section-header" data-section-slug="{{ section.slug }}">
+                                <div class="section-header__left">
+                                    <span class="section-header__icon">{{ section.icon|default:'📁' }}</span>
+                                    <span class="section-header__name">{{ section.name }}</span>
                                 </div>
-                                <div class="nav-children">
-                                    {% if section.children.active %}
-                                        {% for child in section.children.all %}
-                                            {% if child.is_active %}
-                                                <a href="{% url 'knowledge:section_detail' child.slug %}" class="nav-link nav-link--child" title="Подраздел: {{ child.name }}">
-                                                    {{ child.icon|default:'▸' }} {{ child.name }}
-                                                </a>
-                                                {% with child_articles=child.articles.all %}
-                                                    {% if child_articles %}
-                                                        {% for art in child_articles|slice:":5" %}
-                                                            <a href="{% url 'knowledge:article_detail' art.slug %}" class="nav-link nav-link--article" title="{{ art.title }}">{{ art.title|truncatechars:40 }}</a>
-                                                        {% endfor %}
-                                                    {% endif %}
-                                                {% endwith %}
-                                            {% endif %}
+                                <span class="section-header__chevron section-header__chevron--closed"><i class="fas fa-chevron-down"></i></span>
+                            </div>
+                            <!-- SECTION CHILDREN (hidden by default) -->
+                            <div class="section-children section-children--hidden">
+                                {% if section.children.active %}
+                                    {% for child in section.children.all %}
+                                        {% if child.is_active %}
+                                            <a href="{% url 'knowledge:section_detail' child.slug %}" class="nav-link nav-link--child" title="Подраздел: {{ child.name }}">
+                                                {{ child.icon|default:'▸' }} {{ child.name }}
+                                            </a>
+                                            {% with child_articles=child.articles.all %}
+                                                {% if child_articles %}
+                                                    {% for art in child_articles|slice:":5" %}
+                                                        <a href="{% url 'knowledge:article_detail' art.slug %}" class="nav-link nav-link--article" title="{{ art.title }}">{{ art.title|truncatechars:40 }}</a>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endwith %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                {% with section_articles=section.articles.all %}
+                                    {% if section_articles %}
+                                        {% for art in section_articles|slice:":5" %}
+                                            <a href="{% url 'knowledge:article_detail' art.slug %}" class="nav-link nav-link--article" title="{{ art.title }}">{{ art.title|truncatechars:40 }}</a>
                                         {% endfor %}
                                     {% endif %}
-                                    {% with section_articles=section.articles.all %}
-                                        {% if section_articles %}
-                                            {% for art in section_articles|slice:":5" %}
-                                                <a href="{% url 'knowledge:article_detail' art.slug %}" class="nav-link nav-link--article" title="{{ art.title }}">{{ art.title|truncatechars:40 }}</a>
-                                            {% endfor %}
-                                        {% endif %}
-                                    {% endwith %}
-                                </div>
-                            </li>
-                        {% empty %}
-                            <li class="nav-empty">Нет разделов</li>
-                        {% endfor %}
-                    </ul>
+                                {% endwith %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="nav-empty">Нет разделов</div>
+                    {% endfor %}
                 </div>
 
                 <div class="nav-section">
@@ -176,27 +175,33 @@
             document.getElementById('main').classList.toggle('main--shifted');
         }
 
-        // Разворачивание/сворачивание разделов в сайдбаре по стрелочке
+        // SECTION TOGGLE — клик по заголовку разворачивает/сворачивает
         document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.nav-chevron-btn').forEach(function(btn) {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    var children = this.closest('.nav-list-item').querySelector('.nav-children');
-                    if (children) {
-                        if (children.classList.contains('nav-children--expanded')) {
-                            children.classList.remove('nav-children--expanded');
-                            this.classList.remove('nav-chevron-btn--expanded');
-                        } else {
-                            document.querySelectorAll('.nav-children--expanded').forEach(function(el) {
-                                el.classList.remove('nav-children--expanded');
-                            });
-                            document.querySelectorAll('.nav-chevron-btn--expanded').forEach(function(el) {
-                                el.classList.remove('nav-chevron-btn--expanded');
-                            });
-                            children.classList.add('nav-children--expanded');
-                            btn.classList.add('nav-chevron-btn--expanded');
-                        }
+            document.querySelectorAll('.section-header').forEach(function(header) {
+                header.addEventListener('click', function(e) {
+                    var wrapper = this.closest('.section-wrapper');
+                    var children = wrapper.querySelector('.section-children');
+                    var chevron = this.querySelector('.section-header__chevron');
+                    var isOpen = !children.classList.contains('section-children--hidden');
+
+                    if (isOpen) {
+                        // Сворачиваем
+                        children.classList.add('section-children--hidden');
+                        chevron.classList.remove('section-header__chevron--open');
+                        chevron.classList.add('section-header__chevron--closed');
+                    } else {
+                        // Сворачиваем все другие открытые
+                        document.querySelectorAll('.section-children').forEach(function(el) {
+                            el.classList.add('section-children--hidden');
+                        });
+                        document.querySelectorAll('.section-header__chevron').forEach(function(ch) {
+                            ch.classList.remove('section-header__chevron--open');
+                            ch.classList.add('section-header__chevron--closed');
+                        });
+                        // Разворачиваем текущий
+                        children.classList.remove('section-children--hidden');
+                        chevron.classList.remove('section-header__chevron--closed');
+                        chevron.classList.add('section-header__chevron--open');
                     }
                 });
             });
