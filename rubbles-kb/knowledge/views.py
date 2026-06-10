@@ -232,12 +232,17 @@ def changelog_list(request):
 
 @login_required
 def mark_article_outdated(request, slug):
-    """Пометить статью как устаревшую"""
+    """Переключить статус устаревшей статьи (toggle)"""
     article = get_object_or_404(Article, slug=slug)
     if request.method == 'POST':
-        article.is_outdated = True
-        article.save()
-        messages.warning(request, 'Статья помечена как устаревшая')
+        if article.is_outdated:
+            article.is_outdated = False
+            article.save()
+            messages.success(request, 'Статья снова актуальна')
+        else:
+            article.is_outdated = True
+            article.save()
+            messages.warning(request, 'Статья помечена как устаревшая')
     return redirect('knowledge:article_detail', slug=slug)
 
 

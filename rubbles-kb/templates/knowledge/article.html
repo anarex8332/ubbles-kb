@@ -20,7 +20,7 @@
     </div>
     <div class="article-toolbar__right">
         {% if user.is_authenticated %}
-            <a href="{% url 'knowledge:article_edit' article.slug %}" class="btn btn-outline btn-sm" title="Редактировать">
+            <a href="{% url 'knowledge:article_edit' article.slug %}" class="btn btn-outline btn-sm">
                 <i class="fas fa-edit"></i> Редактировать
             </a>
             <a href="{% url 'knowledge:article_version_history' article.slug %}" class="btn-icon" title="История версий">
@@ -35,8 +35,12 @@
             </a>
             <form action="{% url 'knowledge:mark_outdated' article.slug %}" method="POST" style="display:inline">
                 {% csrf_token %}
-                <button type="submit" class="btn-icon" title="Пометить устаревшей">
-                    <i class="fas fa-flag"></i>
+                <button type="submit" class="btn-icon" title="{% if article.is_outdated %}Снять отметку устаревшей{% else %}Пометить устаревшей{% endif %}">
+                    {% if article.is_outdated %}
+                        <i class="fas fa-undo"></i>
+                    {% else %}
+                        <i class="fas fa-flag"></i>
+                    {% endif %}
                 </button>
             </form>
         {% endif %}
