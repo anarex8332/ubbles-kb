@@ -27,32 +27,25 @@ document.addEventListener('DOMContentLoaded', function() {
     initThemeToggle();
 });
 
-// ===== THEME TOGGLE =====
+// ===== THEME TOGGLE (switch) =====
 function initThemeToggle() {
-    const btn = document.getElementById('theme-toggle');
-    if (!btn) return;
+    const toggle = document.getElementById('theme-toggle');
+    if (!toggle) return;
 
     // Load saved theme
     const saved = localStorage.getItem('rubbles-theme') || 'light';
     if (saved === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
-        btn.innerHTML = '<i data-feather="sun"></i>';
+        toggle.checked = true;
     }
 
-    btn.addEventListener('click', function() {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        if (isDark) {
-            document.documentElement.removeAttribute('data-theme');
-            localStorage.setItem('rubbles-theme', 'light');
-            btn.innerHTML = '<i data-feather="moon"></i>';
-        } else {
+    toggle.addEventListener('change', function() {
+        if (this.checked) {
             document.documentElement.setAttribute('data-theme', 'dark');
             localStorage.setItem('rubbles-theme', 'dark');
-            btn.innerHTML = '<i data-feather="sun"></i>';
-        }
-        // Re-render Feather
-        if (typeof feather !== 'undefined') {
-            feather.replace({ width: 20, height: 20 });
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('rubbles-theme', 'light');
         }
     });
 }
