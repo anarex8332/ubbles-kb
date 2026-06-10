@@ -40,12 +40,15 @@ def profile_view(request):
 @login_required
 def profile_edit(request):
     """Редактирование профиля"""
+    # Создаём профиль, если его нет (для старых пользователей)
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
     user_form = UserForm(instance=request.user)
-    profile_form = UserProfileForm(instance=request.user.profile)
+    profile_form = UserProfileForm(instance=profile)
 
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=request.user)
-        profile_form = UserProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
