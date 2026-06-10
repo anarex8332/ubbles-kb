@@ -83,13 +83,13 @@
                     <ul class="nav-list">
                         {% for section in nav_sections %}
                             <li class="nav-list-item">
-                                <a href="{% url 'knowledge:section_detail' section.slug %}" class="nav-link nav-link--section {% if section.slug == current_section_slug %}nav-link--expanded{% endif %}" 
+                                <a href="{% url 'knowledge:section_detail' section.slug %}" class="nav-link nav-link--section" 
                                    data-slug="{{ section.slug }}" title="Раздел: {{ section.name }}">
                                     <span class="nav-icon">{{ section.icon|default:'📁' }}</span>
                                     <span class="nav-chevron"><i class="fas fa-chevron-down"></i></span>
                                     {{ section.name }}
                                 </a>
-                                <div class="nav-children {% if section.slug != current_section_slug %}nav-children--collapsed{% endif %}">
+                                <div class="nav-children">
                                     {% if section.children.active %}
                                         {% for child in section.children.all %}
                                             {% if child.is_active %}

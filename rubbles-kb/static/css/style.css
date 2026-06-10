@@ -254,9 +254,9 @@ a:hover { color: var(--primary-hover); }
 .nav-link--expanded .nav-chevron { transform: rotate(0deg); }
 .nav-link--section:not(.nav-link--expanded) .nav-chevron { transform: rotate(-90deg); }
 
-/* Collapsible children */
-.nav-children--collapsed { display: none; }
-.nav-children { display: block; }
+/* Collapsible children - always collapsed by default */
+.nav-children { display: none; }
+.nav-children--expanded { display: block; }
 .nav-list-item { margin-bottom: 2px; }
 .nav-icon { width: 20px; text-align: center; font-size: 15px; flex-shrink: 0; }
 .nav-empty { color: var(--text-muted); font-size: 13px; padding: 4px 12px 4px 28px; }
