@@ -45,7 +45,7 @@
             <div class="form-group">
                 <label for="content">Содержимое</label>
                 <p class="form-help">Поддерживается HTML. Mermaid-диаграммы вставляются в блоки <code><div class="mermaid">...</div></code>. Emoji можно вставлять напрямую.</p>
-                <textarea name="content" id="content" rows="20" required class="form-textarea form-textarea--lg">{{ article.content|default:'' }}</textarea>
+                <textarea name="content" id="content" rows="20" required class="form-textarea form-textarea--lg emoji-enabled">{{ article.content|default:'' }}</textarea>
             </div>
 
             {% if is_edit %}

@@ -36,9 +36,13 @@
                     <a href="{% url 'knowledge:article_create' %}" class="btn btn-primary btn-sm">
                         <i class="fas fa-plus"></i> Создать
                     </a>
-                    <div class="user-avatar" title="{{ user.username }}">
-                        {{ user.username|first|upper }}
-                    </div>
+                    <a href="{% url 'profile' %}" class="user-avatar" title="{{ user.username }}">
+                        {% if user.profile.avatar %}
+                            <img src="{{ user.profile.avatar.url }}" alt="" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                        {% else %}
+                            {{ user.username|first|upper }}
+                        {% endif %}
+                    </a>
                     <a href="{% url 'logout' %}" class="btn-icon" title="Выйти">
                         <i class="fas fa-sign-out-alt"></i>
                     </a>
