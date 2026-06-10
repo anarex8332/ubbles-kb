@@ -249,10 +249,17 @@ a:hover { color: var(--primary-hover); }
 .nav-link--article { padding-left: 56px; font-size: 12.5px; color: var(--text-secondary); }
 .nav-link--article::before { content: '📄'; margin-right: 4px; font-size: 11px; }
 .nav-link--small { padding: 4px 12px 4px 28px; font-size: 13px; }
-.nav-link--section { padding-left: 12px; font-weight: 500; }
-.nav-link--section .nav-chevron { margin-left: auto; font-size: 10px; color: var(--text-muted); transition: transform 0.2s; }
-.nav-link--expanded .nav-chevron { transform: rotate(0deg); }
-.nav-link--section:not(.nav-link--expanded) .nav-chevron { transform: rotate(-90deg); }
+.nav-section-row { display: flex; align-items: center; }
+.nav-section-row .nav-link--section { flex: 1; padding-left: 12px; font-weight: 500; }
+.nav-chevron-btn { 
+    background: none; border: none; cursor: pointer; 
+    padding: 5px 10px; color: var(--text-muted); font-size: 10px;
+    transition: transform 0.2s; flex-shrink: 0;
+    border-radius: var(--radius);
+}
+.nav-chevron-btn:hover { background: var(--border-light); color: var(--text); }
+.nav-chevron-btn--expanded { transform: rotate(0deg); }
+.nav-chevron-btn:not(.nav-chevron-btn--expanded) { transform: rotate(-90deg); }
 
 /* Collapsible children - always collapsed by default */
 .nav-children { display: none; }

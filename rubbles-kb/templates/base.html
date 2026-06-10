@@ -83,12 +83,14 @@
                     <ul class="nav-list">
                         {% for section in nav_sections %}
                             <li class="nav-list-item">
-                                <a href="{% url 'knowledge:section_detail' section.slug %}" class="nav-link nav-link--section" 
-                                   data-slug="{{ section.slug }}" title="Раздел: {{ section.name }}">
-                                    <span class="nav-icon">{{ section.icon|default:'📁' }}</span>
-                                    <span class="nav-chevron"><i class="fas fa-chevron-down"></i></span>
-                                    {{ section.name }}
-                                </a>
+                                <div class="nav-section-row">
+                                    <a href="{% url 'knowledge:section_detail' section.slug %}" class="nav-link nav-link--section" 
+                                       data-slug="{{ section.slug }}" title="Раздел: {{ section.name }}">
+                                        <span class="nav-icon">{{ section.icon|default:'📁' }}</span>
+                                        {{ section.name }}
+                                    </a>
+                                    <button class="nav-chevron-btn" title="Развернуть/свернуть"><i class="fas fa-chevron-down"></i></button>
+                                </div>
                                 <div class="nav-children">
                                     {% if section.children.active %}
                                         {% for child in section.children.all %}
@@ -174,23 +176,26 @@
             document.getElementById('main').classList.toggle('main--shifted');
         }
 
-        // Разворачивание/сворачивание разделов в сайдбаре
+        // Разворачивание/сворачивание разделов в сайдбаре по стрелочке
         document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.nav-link--section').forEach(function(link) {
-                link.addEventListener('click', function(e) {
-                    var children = this.nextElementSibling;
-                    if (children && children.classList.contains('nav-children')) {
+            document.querySelectorAll('.nav-chevron-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var children = this.closest('.nav-list-item').querySelector('.nav-children');
+                    if (children) {
                         if (children.classList.contains('nav-children--expanded')) {
-                            // Если уже развёрнут — переходим по ссылке
-                            return true;
+                            children.classList.remove('nav-children--expanded');
+                            this.classList.remove('nav-chevron-btn--expanded');
                         } else {
-                            // Иначе разворачиваем и не переходим
-                            e.preventDefault();
-                            // Сворачиваем все остальные
                             document.querySelectorAll('.nav-children--expanded').forEach(function(el) {
-                                if (el !== children) el.classList.remove('nav-children--expanded');
+                                el.classList.remove('nav-children--expanded');
+                            });
+                            document.querySelectorAll('.nav-chevron-btn--expanded').forEach(function(el) {
+                                el.classList.remove('nav-chevron-btn--expanded');
                             });
                             children.classList.add('nav-children--expanded');
+                            btn.classList.add('nav-chevron-btn--expanded');
                         }
                     }
                 });
