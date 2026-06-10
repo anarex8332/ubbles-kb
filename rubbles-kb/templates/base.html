@@ -129,26 +129,38 @@
                 </div>
 
                 {% if user.is_authenticated %}
-                    <div class="nav-section">
-                        <div class="nav-title"><i class="fas fa-history"></i> Недавние</div>
-                        <ul class="nav-list">
+                    <div class="section-wrapper sidebar-collapsible">
+                        <div class="section-header sidebar-collapsible-header">
+                            <div class="section-header__left">
+                                <span class="section-header__icon"><i class="fas fa-history"></i></span>
+                                <span class="section-header__name">Недавние</span>
+                            </div>
+                            <button class="section-header__chevron-btn section-header__chevron-btn--closed" type="button"><i class="fas fa-chevron-down"></i></button>
+                        </div>
+                        <div class="section-children section-children--hidden">
                             {% for rv in recently_viewed %}
-                                <li><a href="{% url 'knowledge:article_detail' rv.article.slug %}" class="nav-link nav-link--small">{{ rv.article.title|truncatechars:40 }}</a></li>
+                                <a href="{% url 'knowledge:article_detail' rv.article.slug %}" class="nav-link nav-link--article">{{ rv.article.title|truncatechars:40 }}</a>
                             {% empty %}
-                                <li class="nav-empty">Нет просмотров</li>
+                                <div class="nav-empty">Нет просмотров</div>
                             {% endfor %}
-                        </ul>
+                        </div>
                     </div>
 
-                    <div class="nav-section">
-                        <div class="nav-title"><i class="fas fa-bookmark"></i> Закладки</div>
-                        <ul class="nav-list">
+                    <div class="section-wrapper sidebar-collapsible">
+                        <div class="section-header sidebar-collapsible-header">
+                            <div class="section-header__left">
+                                <span class="section-header__icon"><i class="fas fa-bookmark"></i></span>
+                                <span class="section-header__name">Закладки</span>
+                            </div>
+                            <button class="section-header__chevron-btn section-header__chevron-btn--closed" type="button"><i class="fas fa-chevron-down"></i></button>
+                        </div>
+                        <div class="section-children section-children--hidden">
                             {% for bm in bookmarks %}
-                                <li><a href="{% url 'knowledge:article_detail' bm.article.slug %}" class="nav-link nav-link--small">{{ bm.article.title|truncatechars:40 }}</a></li>
+                                <a href="{% url 'knowledge:article_detail' bm.article.slug %}" class="nav-link nav-link--article">{{ bm.article.title|truncatechars:40 }}</a>
                             {% empty %}
-                                <li class="nav-empty">Нет закладок</li>
+                                <div class="nav-empty">Нет закладок</div>
                             {% endfor %}
-                        </ul>
+                        </div>
                     </div>
                 {% endif %}
             </div>
@@ -177,33 +189,49 @@
             document.getElementById('main').classList.toggle('main--shifted');
         }
 
-        // Секции: стрелка ▼ — разворачивает/сворачивает, название — ведёт на страницу
+        // Функция переключения секции
+        function toggleSection(wrapper, btn) {
+            var children = wrapper.querySelector('.section-children');
+            var isOpen = !children.classList.contains('section-children--hidden');
+            if (isOpen) {
+                children.classList.add('section-children--hidden');
+                if (btn) {
+                    btn.classList.remove('section-header__chevron-btn--open');
+                    btn.classList.add('section-header__chevron-btn--closed');
+                }
+            } else {
+                document.querySelectorAll('.section-children').forEach(function(el) {
+                    el.classList.add('section-children--hidden');
+                });
+                document.querySelectorAll('.section-header__chevron-btn').forEach(function(b) {
+                    b.classList.remove('section-header__chevron-btn--open');
+                    b.classList.add('section-header__chevron-btn--closed');
+                });
+                children.classList.remove('section-children--hidden');
+                if (btn) {
+                    btn.classList.remove('section-header__chevron-btn--closed');
+                    btn.classList.add('section-header__chevron-btn--open');
+                }
+            }
+        }
+
+        // Стрелка ▼ для всех секций
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.section-header__chevron-btn').forEach(function(btn) {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     var wrapper = this.closest('.section-wrapper');
-                    var children = wrapper.querySelector('.section-children');
-                    var isOpen = !children.classList.contains('section-children--hidden');
+                    toggleSection(wrapper, this);
+                });
+            });
 
-                    if (isOpen) {
-                        children.classList.add('section-children--hidden');
-                        this.classList.remove('section-header__chevron-btn--open');
-                        this.classList.add('section-header__chevron-btn--closed');
-                    } else {
-                        // Сворачиваем все открытые
-                        document.querySelectorAll('.section-children').forEach(function(el) {
-                            el.classList.add('section-children--hidden');
-                        });
-                        document.querySelectorAll('.section-header__chevron-btn').forEach(function(b) {
-                            b.classList.remove('section-header__chevron-btn--open');
-                            b.classList.add('section-header__chevron-btn--closed');
-                        });
-                        // Разворачиваем текущий
-                        children.classList.remove('section-children--hidden');
-                        this.classList.remove('section-header__chevron-btn--closed');
-                        this.classList.add('section-header__chevron-btn--open');
-                    }
+            // Клик по заголовку "Недавние" и "Закладки" — тоже переключает
+            document.querySelectorAll('.sidebar-collapsible .section-header').forEach(function(header) {
+                header.addEventListener('click', function(e) {
+                    if (e.target.closest('.section-header__chevron-btn')) return;
+                    var wrapper = this.closest('.section-wrapper');
+                    var btn = wrapper.querySelector('.section-header__chevron-btn');
+                    toggleSection(wrapper, btn);
                 });
             });
         });
