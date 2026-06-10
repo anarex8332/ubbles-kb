@@ -589,17 +589,7 @@ a:hover { color: var(--primary-hover); }
 .comment-form { margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px; }
 .comment-form textarea { min-height: 60px; }
 
-/* ===== TOOLTIP ===== */
-[title] { position: relative; }
-[title]:hover::after {
-    content: attr(title);
-    position: absolute; bottom: calc(100% + 6px);
-    left: 50%; transform: translateX(-50%);
-    background: #172B4D; color: white;
-    padding: 4px 8px; border-radius: var(--radius);
-    font-size: 11px; white-space: nowrap;
-    z-index: 300; pointer-events: none; box-shadow: var(--shadow);
-}
+/* Tooltips — убраны глобально. Используются только инлайн в article.html */
 
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar { width: 6px; height: 6px; }

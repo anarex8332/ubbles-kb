@@ -32,7 +32,7 @@
                     </div>
                     <div>
                         {% if not notification.is_read %}
-                            <a href="{% url 'knowledge:notification_read' notification.pk %}" class="btn btn-outline btn-sm" title="Отметить прочитанным">
+                            <a href="{% url 'knowledge:notification_read' notification.pk %}" class="btn btn-outline btn-sm">
                                 <i class="fas fa-check"></i>
                             </a>
                         {% endif %}
