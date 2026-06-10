@@ -150,7 +150,7 @@
     <script src="{% static 'js/main.js' %}"></script>
     <script>
         mermaid.initialize({
-            startOnLoad: true,
+            startOnLoad: false,
             theme: 'base',
             themeVariables: {
                 primaryColor: '#0052CC',
@@ -158,6 +158,13 @@
                 lineColor: '#DFE1E6',
             },
             securityLevel: 'loose',
+        });
+
+        // Запускаем Mermaid только если есть блоки с диаграммами
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.querySelector('.mermaid')) {
+                mermaid.run();
+            }
         });
 
         function toggleSidebar() {
