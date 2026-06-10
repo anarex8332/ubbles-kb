@@ -30,22 +30,28 @@ document.addEventListener('DOMContentLoaded', function() {
 // ===== THEME TOGGLE (switch) =====
 function initThemeToggle() {
     const toggle = document.getElementById('theme-toggle');
+    console.log('Theme toggle found:', !!toggle);
     if (!toggle) return;
 
-    // Load saved theme
+    // Force apply — сразу применяем тему при загрузке
     const saved = localStorage.getItem('rubbles-theme') || 'light';
+    console.log('Saved theme:', saved);
     if (saved === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
         toggle.checked = true;
+        console.log('Dark theme applied on load');
     }
 
     toggle.addEventListener('change', function() {
+        console.log('Toggle changed, checked:', this.checked);
         if (this.checked) {
             document.documentElement.setAttribute('data-theme', 'dark');
             localStorage.setItem('rubbles-theme', 'dark');
+            console.log('Dark theme set');
         } else {
             document.documentElement.removeAttribute('data-theme');
             localStorage.setItem('rubbles-theme', 'light');
+            console.log('Light theme set');
         }
     });
 }
