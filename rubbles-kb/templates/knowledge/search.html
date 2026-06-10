@@ -19,7 +19,7 @@
                 {% for article in articles %}
                     <li class="article-list__item">
                         <a href="{% url 'knowledge:article_detail' article.slug %}" class="article-list__link">
-                            <span class="article-list__title">{{ article.title|highlight:query }}</span>
+                            <span class="article-list__title">{{ article.title }}</span>
                             <span class="article-list__meta">
                                 <span>📁 {{ article.section.name|default:'Без раздела' }}</span>
                                 <span>🕐 {{ article.updated_at|date:"d.m.Y" }}</span>
