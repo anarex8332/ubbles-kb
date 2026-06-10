@@ -178,8 +178,21 @@
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.nav-link--section').forEach(function(link) {
                 link.addEventListener('click', function(e) {
-                    // Если есть дочерние элементы, разрешаем переход по ссылке
-                    // Поведение по умолчанию — переход на страницу раздела
+                    var children = this.nextElementSibling;
+                    if (children && children.classList.contains('nav-children')) {
+                        if (children.classList.contains('nav-children--expanded')) {
+                            // Если уже развёрнут — переходим по ссылке
+                            return true;
+                        } else {
+                            // Иначе разворачиваем и не переходим
+                            e.preventDefault();
+                            // Сворачиваем все остальные
+                            document.querySelectorAll('.nav-children--expanded').forEach(function(el) {
+                                if (el !== children) el.classList.remove('nav-children--expanded');
+                            });
+                            children.classList.add('nav-children--expanded');
+                        }
+                    }
                 });
             });
         });
