@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from .forms import UserProfileForm, UserForm
+from .forms import UserProfileForm, UserEmailForm
 from .models import UserProfile
 
 
@@ -43,18 +43,18 @@ def profile_edit(request):
     # Создаём профиль, если его нет (для старых пользователей)
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
-    user_form = UserForm(instance=request.user)
+    email_form = UserEmailForm(instance=request.user)
     profile_form = UserProfileForm(instance=profile)
 
     if request.method == 'POST':
-        user_form = UserForm(request.POST, instance=request.user)
+        email_form = UserEmailForm(request.POST, instance=request.user)
         profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
+        if email_form.is_valid() and profile_form.is_valid():
+            email_form.save()
             profile_form.save()
             return redirect('profile')
 
     return render(request, 'accounts/profile_edit.html', {
-        'user_form': user_form,
+        'email_form': email_form,
         'profile_form': profile_form,
     })

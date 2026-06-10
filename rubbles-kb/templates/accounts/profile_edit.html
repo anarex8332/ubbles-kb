@@ -20,17 +20,18 @@
             {% csrf_token %}
 
             <div class="form-group">
-                <label for="id_username">Имя пользователя</label>
-                <input type="text" name="username" id="id_username" value="{{ user_form.username.value }}" class="form-input" required>
+                <label>Имя пользователя</label>
+                <input type="text" value="{{ user.username }}" class="form-input" disabled style="background:var(--bg);color:var(--text-secondary);">
+                <small class="form-help">Имя пользователя нельзя изменить</small>
             </div>
 
             <div class="form-group">
                 <label for="id_email">Email</label>
-                <input type="email" name="email" id="id_email" value="{{ user_form.email.value|default:'' }}" class="form-input" placeholder="your@email.com">
+                <input type="email" name="email" id="id_email" value="{{ email_form.email.value|default:'' }}" class="form-input" placeholder="your@email.com">
             </div>
 
             <div class="form-group">
-                <label>Текущее фото</label>
+                <label>Фото профиля</label>
                 {% if user.profile.avatar %}
                     <div style="margin-bottom: 8px;">
                         <img src="{{ user.profile.avatar.url }}" alt="" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">

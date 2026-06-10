@@ -13,11 +13,11 @@ class UserProfileForm(forms.ModelForm):
         }
 
 
-class UserForm(forms.ModelForm):
-    """Форма редактирования имени пользователя"""
+class UserEmailForm(forms.ModelForm):
+    """Форма редактирования email пользователя"""
     class Meta:
         model = User
-        fields = ['username', 'email']
+        fields = ['email']
         widgets = {
-            'email': forms.EmailInput(attrs={'placeholder': 'Email'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Email (необязательно)'}),
         }
