@@ -82,13 +82,15 @@
                     <div class="nav-title"><i class="fas fa-folder"></i> Разделы</div>
                     {% for section in nav_sections %}
                         <div class="section-wrapper" data-section="{{ section.slug }}">
-                            <!-- SECTION HEADER (clickable — toggles chevron) -->
-                            <div class="section-header" data-section-slug="{{ section.slug }}">
-                                <div class="section-header__left">
+                            <!-- SECTION HEADER — название ведёт на страницу, стрелка сворачивает -->
+                            <div class="section-header">
+                                <a href="{% url 'knowledge:section_detail' section.slug %}" class="section-header__link">
                                     <span class="section-header__icon">{{ section.icon|default:'📁' }}</span>
                                     <span class="section-header__name">{{ section.name }}</span>
-                                </div>
-                                <span class="section-header__chevron section-header__chevron--closed"><i class="fas fa-chevron-down"></i></span>
+                                </a>
+                                <button class="section-header__chevron-btn" type="button" title="Развернуть/свернуть">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
                             </div>
                             <!-- SECTION CHILDREN (hidden by default) -->
                             <div class="section-children section-children--hidden">
@@ -175,33 +177,32 @@
             document.getElementById('main').classList.toggle('main--shifted');
         }
 
-        // SECTION TOGGLE — клик по заголовку разворачивает/сворачивает
+        // Секции: стрелка ▼ — разворачивает/сворачивает, название — ведёт на страницу
         document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.section-header').forEach(function(header) {
-                header.addEventListener('click', function(e) {
+            document.querySelectorAll('.section-header__chevron-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
                     var wrapper = this.closest('.section-wrapper');
                     var children = wrapper.querySelector('.section-children');
-                    var chevron = this.querySelector('.section-header__chevron');
                     var isOpen = !children.classList.contains('section-children--hidden');
 
                     if (isOpen) {
-                        // Сворачиваем
                         children.classList.add('section-children--hidden');
-                        chevron.classList.remove('section-header__chevron--open');
-                        chevron.classList.add('section-header__chevron--closed');
+                        this.classList.remove('section-header__chevron-btn--open');
+                        this.classList.add('section-header__chevron-btn--closed');
                     } else {
-                        // Сворачиваем все другие открытые
+                        // Сворачиваем все открытые
                         document.querySelectorAll('.section-children').forEach(function(el) {
                             el.classList.add('section-children--hidden');
                         });
-                        document.querySelectorAll('.section-header__chevron').forEach(function(ch) {
-                            ch.classList.remove('section-header__chevron--open');
-                            ch.classList.add('section-header__chevron--closed');
+                        document.querySelectorAll('.section-header__chevron-btn').forEach(function(b) {
+                            b.classList.remove('section-header__chevron-btn--open');
+                            b.classList.add('section-header__chevron-btn--closed');
                         });
                         // Разворачиваем текущий
                         children.classList.remove('section-children--hidden');
-                        chevron.classList.remove('section-header__chevron--closed');
-                        chevron.classList.add('section-header__chevron--open');
+                        this.classList.remove('section-header__chevron-btn--closed');
+                        this.classList.add('section-header__chevron-btn--open');
                     }
                 });
             });
