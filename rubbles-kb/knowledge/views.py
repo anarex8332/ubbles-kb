@@ -1,9 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.contrib import messages
-from .models import Section, Article, ArticleVersion, Comment, Bookmark, RecentlyViewed, Changelog
+from .models import Section, Article, ArticleVersion, Comment, Bookmark, RecentlyViewed, Changelog, Notification
 
 
 def home(request):
@@ -191,7 +192,35 @@ def add_comment(request, slug):
     if request.method == 'POST' and article.allow_comments:
         text = request.POST.get('text', '').strip()
         if text:
-            Comment.objects.create(article=article, author=request.user, text=text)
+            comment = Comment.objects.create(article=article, author=request.user, text=text)
+            
+            # Уведомление автору статьи о новом комментарии
+            if article.author and article.author != request.user:
+                Notification.objects.create(
+                    user=article.author,
+                    article=article,
+                    message=f'Новый комментарий от {request.user.username} к статье "{article.title[:50]}"',
+                    notification_type='comment_added',
+                    from_user=request.user,
+                )
+            
+            # Уведомления пользователям, упомянутым через @username
+            import re
+            mentions = re.findall(r'@(\w+)', text)
+            for username in mentions:
+                try:
+                    mentioned_user = User.objects.get(username=username)
+                    if mentioned_user != request.user:
+                        Notification.objects.create(
+                            user=mentioned_user,
+                            article=article,
+                            message=f'{request.user.username} упомянул вас в комментарии к статье "{article.title[:50]}"',
+                            notification_type='comment_mention',
+                            from_user=request.user,
+                        )
+                except User.DoesNotExist:
+                    pass
+    
     return redirect('knowledge:article_detail', slug=slug)
 
 
@@ -210,3 +239,23 @@ def mark_article_outdated(request, slug):
         article.save()
         messages.warning(request, 'Статья помечена как устаревшая')
     return redirect('knowledge:article_detail', slug=slug)
+
+
+@login_required
+def notification_list(request):
+    """Список уведомлений пользователя"""
+    notifications = Notification.objects.filter(user=request.user)
+    return render(request, 'knowledge/notifications.html', {
+        'notifications': notifications,
+    })
+
+
+@login_required
+def notification_read(request, pk):
+    """Отметить уведомление как прочитанное"""
+    notification = get_object_or_404(Notification, pk=pk, user=request.user)
+    notification.is_read = True
+    notification.save()
+    if notification.article:
+        return redirect('knowledge:article_detail', slug=notification.article.slug)
+    return redirect('knowledge:notification_list')

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from mptt.admin import MPTTModelAdmin
-from .models import Section, Article, ArticleVersion, Comment, Bookmark, RecentlyViewed, Changelog
+from .models import Section, Article, ArticleVersion, Comment, Bookmark, RecentlyViewed, Changelog, Notification
 
 
 @admin.register(Section)
@@ -39,6 +39,13 @@ class ChangelogAdmin(admin.ModelAdmin):
 class CommentAdmin(admin.ModelAdmin):
     list_display = ['author', 'article', 'created_at', 'is_active']
     list_filter = ['is_active']
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ['user', 'notification_type', 'message', 'is_read', 'created_at']
+    list_filter = ['is_read', 'notification_type']
+    search_fields = ['user__username', 'message']
 
 
 admin.site.register(Bookmark)

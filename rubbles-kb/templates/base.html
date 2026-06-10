@@ -14,10 +14,10 @@
         <!-- Header -->
         <header class="header">
             <div class="header__left">
-                <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+                <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Меню">
                     <i class="fas fa-bars"></i>
                 </button>
-                <a href="{% url 'knowledge:home' %}" class="header__logo">
+                <a href="{% url 'knowledge:home' %}" class="header__logo" title="На главную">
                     <span class="logo-icon"><i class="fas fa-brain"></i></span>
                     <span class="logo-text">RUBBLES KB</span>
                 </a>
@@ -27,15 +27,21 @@
                     <i class="fas fa-search"></i>
                     <input type="text" name="q" placeholder="Поиск по базе знаний..." 
                            value="{{ query|default:'' }}" class="search-input">
-                    <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+                    <button type="submit" class="search-btn" title="Найти"><i class="fas fa-search"></i></button>
                 </form>
             </div>
             <div class="header__right">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'knowledge:article_create' %}" class="btn btn-primary btn-sm">
+                    <a href="{% url 'knowledge:article_create' %}" class="btn btn-primary btn-sm" title="Создать статью">
                         <i class="fas fa-plus"></i> Создать
                     </a>
-                    <a href="{% url 'profile' %}" class="user-avatar" title="{{ user.username }}">
+                    <a href="{% url 'knowledge:notification_list' %}" class="notification-bell" title="Уведомления">
+                        <i class="fas fa-bell"></i>
+                        {% if unread_count > 0 %}
+                            <span class="notification-dot"></span>
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'profile' %}" class="user-avatar" title="Профиль: {{ user.username }}">
                         {% if user.profile.avatar %}
                             <img src="{{ user.profile.avatar.url }}" alt="" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
                         {% else %}
@@ -46,8 +52,8 @@
                         <i class="fas fa-sign-out-alt"></i>
                     </a>
                 {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Войти</a>
-                    <a href="{% url 'register' %}" class="btn btn-outline btn-sm">Регистрация</a>
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-sm" title="Войти">Войти</a>
+                    <a href="{% url 'register' %}" class="btn btn-outline btn-sm" title="Регистрация">Регистрация</a>
                 {% endif %}
             </div>
         </header>
@@ -66,13 +72,13 @@
                 </div>
 
                 {% if user.is_authenticated %}
-                    <a href="{% url 'knowledge:article_create' %}" class="create-btn">
+                    <a href="{% url 'knowledge:article_create' %}" class="create-btn" title="Создать новую статью">
                         <i class="fas fa-plus"></i> Создать статью
                     </a>
                 {% endif %}
 
                 <div class="nav-section">
-                    <div class="nav-title"><i class="fas fa-home"></i><a href="{% url 'knowledge:home' %}">Главная</a></div>
+                    <div class="nav-title"><i class="fas fa-home"></i><a href="{% url 'knowledge:home' %}" title="На главную">Главная</a></div>
                 </div>
 
                 <div class="nav-section">
@@ -80,14 +86,14 @@
                     <ul class="nav-list">
                         {% for section in nav_sections %}
                             <li>
-                                <a href="{% url 'knowledge:section_detail' section.slug %}" class="nav-link">
+                                <a href="{% url 'knowledge:section_detail' section.slug %}" class="nav-link" title="Раздел: {{ section.name }}">
                                     <span class="nav-icon">{{ section.icon|default:'📁' }}</span>
                                     {{ section.name }}
                                 </a>
                                 {% if section.children.active %}
                                     {% for child in section.children.all %}
                                         {% if child.is_active %}
-                                            <a href="{% url 'knowledge:section_detail' child.slug %}" class="nav-link nav-link--child">
+                                            <a href="{% url 'knowledge:section_detail' child.slug %}" class="nav-link nav-link--child" title="Подраздел: {{ child.name }}">
                                                 {{ child.icon|default:'▸' }} {{ child.name }}
                                             </a>
                                         {% endif %}
@@ -101,7 +107,7 @@
                 </div>
 
                 <div class="nav-section">
-                    <div class="nav-title"><i class="fas fa-code-branch"></i><a href="{% url 'knowledge:changelog' %}">Релизы</a></div>
+                    <div class="nav-title"><i class="fas fa-code-branch"></i><a href="{% url 'knowledge:changelog' %}" title="История релизов">Релизы</a></div>
                 </div>
 
                 {% if user.is_authenticated %}
@@ -109,7 +115,7 @@
                         <div class="nav-title"><i class="fas fa-history"></i> Недавние</div>
                         <ul class="nav-list">
                             {% for rv in recently_viewed %}
-                                <li><a href="{% url 'knowledge:article_detail' rv.article.slug %}" class="nav-link nav-link--small">{{ rv.article.title|truncatechars:40 }}</a></li>
+                                <li><a href="{% url 'knowledge:article_detail' rv.article.slug %}" class="nav-link nav-link--small" title="{{ rv.article.title }}">{{ rv.article.title|truncatechars:40 }}</a></li>
                             {% empty %}
                                 <li class="nav-empty">Нет просмотров</li>
                             {% endfor %}
@@ -120,7 +126,7 @@
                         <div class="nav-title"><i class="fas fa-bookmark"></i> Закладки</div>
                         <ul class="nav-list">
                             {% for bm in bookmarks %}
-                                <li><a href="{% url 'knowledge:article_detail' bm.article.slug %}" class="nav-link nav-link--small">{{ bm.article.title|truncatechars:40 }}</a></li>
+                                <li><a href="{% url 'knowledge:article_detail' bm.article.slug %}" class="nav-link nav-link--small" title="{{ bm.article.title }}">{{ bm.article.title|truncatechars:40 }}</a></li>
                             {% empty %}
                                 <li class="nav-empty">Нет закладок</li>
                             {% endfor %}

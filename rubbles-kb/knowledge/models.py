@@ -171,3 +171,31 @@ class Changelog(models.Model):
 
     def __str__(self):
         return f"{self.version} - {self.title}"
+
+
+class Notification(models.Model):
+    """Уведомление пользователя"""
+    NOTIFICATION_TYPES = [
+        ('comment_mention', 'Упоминание в комментарии'),
+        ('comment_added', 'Новый комментарий к статье'),
+        ('article_updated', 'Статья изменена'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications',
+                             verbose_name='Пользователь')
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, null=True, blank=True,
+                                verbose_name='Статья')
+    message = models.TextField('Сообщение', max_length=500)
+    notification_type = models.CharField('Тип', max_length=50, choices=NOTIFICATION_TYPES)
+    from_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+                                  related_name='sent_notifications', verbose_name='От кого')
+    is_read = models.BooleanField('Прочитано', default=False)
+    created_at = models.DateTimeField('Создано', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Уведомление'
+        verbose_name_plural = 'Уведомления'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"[{'✓' if self.is_read else '○'}] {self.user.username}: {self.message[:50]}"
