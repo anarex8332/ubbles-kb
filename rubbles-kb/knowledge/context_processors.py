@@ -1,3 +1,4 @@
+import re
 from .models import Section, Notification, Article
 
 
@@ -8,8 +9,16 @@ def sections_processor(request):
     articles_prefetch = Prefetch('articles', queryset=Article.objects.filter(status='published').order_by('-updated_at'))
     sections = Section.objects.filter(is_active=True).filter(parent__isnull=True).prefetch_related('children').prefetch_related(articles_prefetch)
     
+    # Определяем slug текущего раздела из URL
+    path = request.path
+    current_slug = ''
+    match = re.search(r'/section/([^/]+)/', path)
+    if match:
+        current_slug = match.group(1)
+    
     ctx = {
         'nav_sections': sections,
+        'current_section_slug': current_slug,
     }
     
     if request.user.is_authenticated:

@@ -82,34 +82,38 @@
                     <div class="nav-title"><i class="fas fa-folder"></i> Разделы</div>
                     <ul class="nav-list">
                         {% for section in nav_sections %}
-                            <li>
-                                <a href="{% url 'knowledge:section_detail' section.slug %}" class="nav-link" title="Раздел: {{ section.name }}">
+                            <li class="nav-list-item">
+                                <a href="{% url 'knowledge:section_detail' section.slug %}" class="nav-link nav-link--section {% if section.slug == current_section_slug %}nav-link--expanded{% endif %}" 
+                                   data-slug="{{ section.slug }}" title="Раздел: {{ section.name }}">
                                     <span class="nav-icon">{{ section.icon|default:'📁' }}</span>
+                                    <span class="nav-chevron"><i class="fas fa-chevron-down"></i></span>
                                     {{ section.name }}
                                 </a>
-                                {% if section.children.active %}
-                                    {% for child in section.children.all %}
-                                        {% if child.is_active %}
-                                            <a href="{% url 'knowledge:section_detail' child.slug %}" class="nav-link nav-link--child" title="Подраздел: {{ child.name }}">
-                                                {{ child.icon|default:'▸' }} {{ child.name }}
-                                            </a>
-                                            {% with child_articles=child.articles.all %}
-                                                {% if child_articles %}
-                                                    {% for art in child_articles|slice:":5" %}
-                                                        <a href="{% url 'knowledge:article_detail' art.slug %}" class="nav-link nav-link--article" title="{{ art.title }}">{{ art.title|truncatechars:40 }}</a>
-                                                    {% endfor %}
-                                                {% endif %}
-                                            {% endwith %}
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                                {% with section_articles=section.articles.all %}
-                                    {% if section_articles %}
-                                        {% for art in section_articles|slice:":5" %}
-                                            <a href="{% url 'knowledge:article_detail' art.slug %}" class="nav-link nav-link--article" title="{{ art.title }}">{{ art.title|truncatechars:40 }}</a>
+                                <div class="nav-children {% if section.slug != current_section_slug %}nav-children--collapsed{% endif %}">
+                                    {% if section.children.active %}
+                                        {% for child in section.children.all %}
+                                            {% if child.is_active %}
+                                                <a href="{% url 'knowledge:section_detail' child.slug %}" class="nav-link nav-link--child" title="Подраздел: {{ child.name }}">
+                                                    {{ child.icon|default:'▸' }} {{ child.name }}
+                                                </a>
+                                                {% with child_articles=child.articles.all %}
+                                                    {% if child_articles %}
+                                                        {% for art in child_articles|slice:":5" %}
+                                                            <a href="{% url 'knowledge:article_detail' art.slug %}" class="nav-link nav-link--article" title="{{ art.title }}">{{ art.title|truncatechars:40 }}</a>
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                {% endwith %}
+                                            {% endif %}
                                         {% endfor %}
                                     {% endif %}
-                                {% endwith %}
+                                    {% with section_articles=section.articles.all %}
+                                        {% if section_articles %}
+                                            {% for art in section_articles|slice:":5" %}
+                                                <a href="{% url 'knowledge:article_detail' art.slug %}" class="nav-link nav-link--article" title="{{ art.title }}">{{ art.title|truncatechars:40 }}</a>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
                             </li>
                         {% empty %}
                             <li class="nav-empty">Нет разделов</li>
@@ -169,6 +173,16 @@
             document.getElementById('sidebar').classList.toggle('sidebar--open');
             document.getElementById('main').classList.toggle('main--shifted');
         }
+
+        // Разворачивание/сворачивание разделов в сайдбаре
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.nav-link--section').forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    // Если есть дочерние элементы, разрешаем переход по ссылке
+                    // Поведение по умолчанию — переход на страницу раздела
+                });
+            });
+        });
     </script>
     {% block extra_scripts %}{% endblock %}
 </body>
