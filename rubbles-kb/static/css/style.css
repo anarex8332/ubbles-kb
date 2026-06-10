@@ -367,7 +367,7 @@ a:hover { color: var(--primary-hover); }
     transition: margin-left 0.2s;
 }
 .page-wrapper {
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 20px 24px 80px;
 }
