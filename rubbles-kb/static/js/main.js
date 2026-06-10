@@ -1,6 +1,11 @@
 // RUBBLES KB — Main JavaScript
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Feather Icons — заменяет data-feather на SVG
+    if (typeof feather !== 'undefined') {
+        feather.replace({ width: 20, height: 20 });
+    }
+
     // Auto-dismiss messages after 5 seconds
     document.querySelectorAll('.msg').forEach(function(msg) {
         setTimeout(function() {
@@ -17,4 +22,37 @@ document.addEventListener('DOMContentLoaded', function() {
             link.classList.add('nav-link--active');
         }
     });
+
+    // Theme toggle
+    initThemeToggle();
 });
+
+// ===== THEME TOGGLE =====
+function initThemeToggle() {
+    const btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+
+    // Load saved theme
+    const saved = localStorage.getItem('rubbles-theme') || 'light';
+    if (saved === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        btn.innerHTML = '<i data-feather="sun"></i>';
+    }
+
+    btn.addEventListener('click', function() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        if (isDark) {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('rubbles-theme', 'light');
+            btn.innerHTML = '<i data-feather="moon"></i>';
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('rubbles-theme', 'dark');
+            btn.innerHTML = '<i data-feather="sun"></i>';
+        }
+        // Re-render Feather
+        if (typeof feather !== 'undefined') {
+            feather.replace({ width: 20, height: 20 });
+        }
+    });
+}
