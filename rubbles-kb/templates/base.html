@@ -130,11 +130,11 @@
 
                 {% if user.is_authenticated %}
                     <div class="section-wrapper sidebar-collapsible">
-                        <div class="section-header sidebar-collapsible-header">
-                            <div class="section-header__left">
+                        <div class="section-header">
+                            <a href="{% url 'knowledge:recently_viewed' %}" class="section-header__link">
                                 <span class="section-header__icon"><i class="fas fa-history"></i></span>
                                 <span class="section-header__name">Недавние</span>
-                            </div>
+                            </a>
                             <button class="section-header__chevron-btn section-header__chevron-btn--closed" type="button"><i class="fas fa-chevron-down"></i></button>
                         </div>
                         <div class="section-children section-children--hidden">
@@ -147,11 +147,11 @@
                     </div>
 
                     <div class="section-wrapper sidebar-collapsible">
-                        <div class="section-header sidebar-collapsible-header">
-                            <div class="section-header__left">
+                        <div class="section-header">
+                            <a href="{% url 'knowledge:bookmark_list' %}" class="section-header__link">
                                 <span class="section-header__icon"><i class="fas fa-bookmark"></i></span>
                                 <span class="section-header__name">Закладки</span>
-                            </div>
+                            </a>
                             <button class="section-header__chevron-btn section-header__chevron-btn--closed" type="button"><i class="fas fa-chevron-down"></i></button>
                         </div>
                         <div class="section-children section-children--hidden">

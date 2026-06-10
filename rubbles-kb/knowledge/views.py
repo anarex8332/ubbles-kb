@@ -247,6 +247,24 @@ def mark_article_outdated(request, slug):
 
 
 @login_required
+def recently_viewed_list(request):
+    """Страница со списком недавних статей"""
+    articles = RecentlyViewed.objects.filter(user=request.user)
+    return render(request, 'knowledge/recently_viewed.html', {
+        'articles': articles,
+    })
+
+
+@login_required
+def bookmark_list(request):
+    """Страница со списком закладок"""
+    bookmarks = Bookmark.objects.filter(user=request.user)
+    return render(request, 'knowledge/bookmarks.html', {
+        'bookmarks': bookmarks,
+    })
+
+
+@login_required
 def notification_list(request):
     """Список уведомлений пользователя"""
     notifications = Notification.objects.filter(user=request.user)

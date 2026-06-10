@@ -17,6 +17,8 @@ urlpatterns = [
     path('article/<slug:slug>/comment/', views.add_comment, name='add_comment'),
     path('article/<slug:slug>/mark-outdated/', views.mark_article_outdated, name='mark_outdated'),
     path('changelog/', views.changelog_list, name='changelog'),
+    path('recently-viewed/', views.recently_viewed_list, name='recently_viewed'),
+    path('bookmarks/', views.bookmark_list, name='bookmark_list'),
     path('notifications/', views.notification_list, name='notification_list'),
     path('notifications/read/<int:pk>/', views.notification_read, name='notification_read'),
 ]
