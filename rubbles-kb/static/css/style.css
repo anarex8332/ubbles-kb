@@ -323,7 +323,7 @@ a:hover { color: var(--primary-hover); }
     transition: margin-left 0.2s;
 }
 .page-wrapper {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 32px 40px 80px;
 }
