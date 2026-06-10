@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_edit %}Редактирование: {{ article.title }}{% else %}Новая статья{% endif %} — RUBBLES KB{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="page-header">
+        <h1>{% if is_edit %}<i class="fas fa-edit"></i> Редактирование статьи{% else %}<i class="fas fa-plus-circle"></i> Новая статья{% endif %}</h1>
+    </div>
+
+    <form method="POST" class="article-form">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="title">Заголовок</label>
+            <input type="text" name="title" id="title" value="{{ article.title|default:'' }}" required class="form-input form-input--lg" placeholder="Введите заголовок статьи">
+        </div>
+
+        <div class="form-group">
+            <label for="section">Раздел</label>
+            <select name="section" id="section" class="form-select">
+                <option value="">— Без раздела —</option>
+                {% for sec in sections %}
+                    <option value="{{ sec.id }}" {% if article.section_id == sec.id %}selected{% endif %}>
+                        {{ sec.icon|default:'📁' }} {{ sec.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="content">Содержимое</label>
+            <p class="form-help">Поддерживается HTML + Mermaid-диаграммы. Emoji можно вставлять напрямую.</p>
+            <textarea name="content" id="content" rows="20" required class="form-textarea form-textarea--lg">{{ article.content|default:'' }}</textarea>
+        </div>
+
+        {% if is_edit %}
+            <div class="form-group">
+                <label for="change_summary">Описание изменений</label>
+                <input type="text" name="change_summary" id="change_summary" class="form-input" placeholder="Кратко опишите, что изменилось" required>
+            </div>
+        {% endif %}
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> {% if is_edit %}Сохранить изменения{% else %}Создать статью{% endif %}
+            </button>
+            <a href="{% if is_edit %}{% url 'knowledge:article_detail' article.slug %}{% else %}{% url 'knowledge:home' %}{% endif %}" class="btn btn-outline">
+                <i class="fas fa-times"></i> Отмена
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

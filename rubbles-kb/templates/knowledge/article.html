@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %}{{ article.title }} — RUBBLES KB{% endblock %}
+
+{% block content %}
+<article class="article-page">
+    <div class="article-toolbar">
+        <div class="article-toolbar__left">
+            <a href="{% if article.section %}{% url 'knowledge:section_detail' article.section.slug %}{% else %}{% url 'knowledge:home' %}{% endif %}" class="btn btn-link">
+                <i class="fas fa-arrow-left"></i> Назад
+            </a>
+        </div>
+        <div class="article-toolbar__right">
+            {% if user.is_authenticated %}
+                <a href="{% url 'knowledge:article_edit' article.slug %}" class="btn btn-outline btn-sm" title="Редактировать">
+                    <i class="fas fa-edit"></i> Правка
+                </a>
+                <a href="{% url 'knowledge:article_version_history' article.slug %}" class="btn btn-outline btn-sm" title="История версий">
+                    <i class="fas fa-history"></i> Версии
+                </a>
+                <a href="{% url 'knowledge:toggle_bookmark' article.slug %}" class="btn btn-outline btn-sm" title="Закладка">
+                    {% if is_bookmarked %}
+                        <i class="fas fa-bookmark" style="color: var(--accent)"></i>
+                    {% else %}
+                        <i class="far fa-bookmark"></i>
+                    {% endif %}
+                </a>
+                <form action="{% url 'knowledge:mark_outdated' article.slug %}" method="POST" style="display:inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline btn-sm" title="Пометить устаревшей">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </button>
+                </form>
+            {% endif %}
+            <button class="btn btn-outline btn-sm" onclick="copyArticleLink()" title="Копировать ссылку">
+                <i class="fas fa-link"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="article-header">
+        <h1 class="article-title">
+            {{ article.title }}
+            {% if article.is_outdated %}
+                <span class="badge badge-warning">🗓 Устаревшая статья</span>
+            {% endif %}
+            {% if article.status == 'draft' %}
+                <span class="badge badge-info">Черновик</span>
+            {% endif %}
+        </h1>
+        <div class="article-meta">
+            <span><i class="fas fa-user"></i> {{ article.author.username|default:'—' }}</span>
+            <span><i class="fas fa-calendar"></i> {{ article.created_at|date:"d.m.Y" }}</span>
+            <span><i class="fas fa-clock"></i> {{ article.updated_at|date:"d.m.Y H:i" }}</span>
+            <span><i class="fas fa-tag"></i> {{ article.section.name|default:'Без раздела' }}</span>
+            <span><i class="fas fa-code-branch"></i> v{{ article.version }}</span>
+            <span><i class="fas fa-eye"></i> {{ article.views_count }}</span>
+        </div>
+    </div>
+
+    <div class="article-content">
+        {{ article.content|safe }}
+    </div>
+
+    {% if article.allow_comments %}
+        <section class="card comments-section">
+            <div class="card__header">
+                <h2><i class="fas fa-comments"></i> Комментарии ({{ comments|length }})</h2>
+            </div>
+            <div class="card__body">
+                {% if user.is_authenticated %}
+                    <form action="{% url 'knowledge:add_comment' article.slug %}" method="POST" class="comment-form">
+                        {% csrf_token %}
+                        <textarea name="text" rows="3" placeholder="Напишите комментарий..." required class="form-textarea"></textarea>
+                        <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-paper-plane"></i> Отправить</button>
+                    </form>
+                {% endif %}
+
+                {% if comments %}
+                    <div class="comments-list">
+                        {% for comment in comments %}
+                            <div class="comment">
+                                <div class="comment__header">
+                                    <strong>{{ comment.author.username }}</strong>
+                                    <span class="comment__date">{{ comment.created_at|date:"d.m.Y H:i" }}</span>
+                                </div>
+                                <div class="comment__text">{{ comment.text }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="empty-state">Комментариев пока нет</p>
+                {% endif %}
+            </div>
+        </section>
+    {% endif %}
+</article>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function copyArticleLink() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+        alert('Ссылка скопирована: ' + url);
+    });
+}
+</script>
+{% endblock %}

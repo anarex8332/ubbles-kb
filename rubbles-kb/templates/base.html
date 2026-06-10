@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RUBBLES Planning Force — База знаний{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="layout">
+        <!-- Шапка -->
+        <header class="header">
+            <div class="header__left">
+                <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Меню">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="{% url 'knowledge:home' %}" class="header__logo">
+                    <span class="logo-icon">📘</span>
+                    <span class="logo-text">RUBBLES KB</span>
+                </a>
+            </div>
+            <div class="header__center">
+                <form action="{% url 'knowledge:search' %}" method="GET" class="search-form">
+                    <input type="text" name="q" placeholder="Поиск по базе знаний..." 
+                           value="{{ query|default:'' }}" class="search-input">
+                    <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            <div class="header__right">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'knowledge:article_create' %}" class="btn btn-primary btn-sm" title="Новая статья">
+                        <i class="fas fa-plus"></i> Статья
+                    </a>
+                    <span class="user-greeting">{{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="btn btn-outline btn-sm"><i class="fas fa-sign-out-alt"></i></a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Войти</a>
+                    <a href="{% url 'register' %}" class="btn btn-outline btn-sm">Регистрация</a>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- Боковая панель -->
+        <aside class="sidebar" id="sidebar">
+            <nav class="sidebar__nav">
+                <div class="nav-section">
+                    <h3 class="nav-title"><a href="{% url 'knowledge:home' %}"><i class="fas fa-home"></i> Главная</a></h3>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="nav-title"><i class="fas fa-folder"></i> Разделы</h3>
+                    <ul class="nav-list">
+                        {% for section in nav_sections %}
+                            <li class="nav-item">
+                                <a href="{% url 'knowledge:section_detail' section.slug %}" class="nav-link">
+                                    <span class="nav-icon">{{ section.icon|default:'📁' }}</span>
+                                    {{ section.name }}
+                                </a>
+                                {% if section.children.active %}
+                                    <ul class="nav-sublist">
+                                        {% for child in section.children.all %}
+                                            {% if child.is_active %}
+                                                <li>
+                                                    <a href="{% url 'knowledge:section_detail' child.slug %}" class="nav-link nav-link--child">
+                                                        {{ child.icon|default:'▸' }} {{ child.name }}
+                                                    </a>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </li>
+                        {% empty %}
+                            <li class="nav-empty">Разделы пока не созданы</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h3 class="nav-title"><a href="{% url 'knowledge:changelog' %}"><i class="fas fa-code-branch"></i> Релизы</a></h3>
+                </div>
+
+                {% if user.is_authenticated %}
+                    <div class="nav-section">
+                        <h3 class="nav-title"><i class="fas fa-history"></i> Недавние</h3>
+                        <ul class="nav-list">
+                            {% for rv in recently_viewed %}
+                                <li><a href="{% url 'knowledge:article_detail' rv.article.slug %}" class="nav-link nav-link--small">{{ rv.article.title|truncatechars:40 }}</a></li>
+                            {% empty %}
+                                <li class="nav-empty">Нет просмотров</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="nav-section">
+                        <h3 class="nav-title"><i class="fas fa-bookmark"></i> Закладки</h3>
+                        <ul class="nav-list">
+                            {% for bm in bookmarks %}
+                                <li><a href="{% url 'knowledge:article_detail' bm.article.slug %}" class="nav-link nav-link--small">{{ bm.article.title|truncatechars:40 }}</a></li>
+                            {% empty %}
+                                <li class="nav-empty">Нет закладок</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </nav>
+        </aside>
+
+        <!-- Основной контент -->
+        <main class="main" id="main">
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="message message--{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            securityLevel: 'loose',
+        });
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('sidebar--open');
+            document.getElementById('main').classList.toggle('main--shifted');
+        }
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
