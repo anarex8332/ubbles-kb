@@ -7,7 +7,6 @@
     <title>{% block title %}RUBBLES Planning Force — База знаний{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -149,24 +148,6 @@
 
     <script src="{% static 'js/main.js' %}"></script>
     <script>
-        mermaid.initialize({
-            startOnLoad: false,
-            theme: 'base',
-            themeVariables: {
-                primaryColor: '#0052CC',
-                primaryTextColor: '#fff',
-                lineColor: '#DFE1E6',
-            },
-            securityLevel: 'loose',
-        });
-
-        // Запускаем Mermaid только если есть блоки с диаграммами
-        document.addEventListener('DOMContentLoaded', function() {
-            if (document.querySelector('.mermaid')) {
-                mermaid.run();
-            }
-        });
-
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('sidebar--open');
             document.getElementById('main').classList.toggle('main--shifted');

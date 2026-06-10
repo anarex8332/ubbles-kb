@@ -109,6 +109,27 @@
 </article>
 {% endblock %}
 
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+    startOnLoad: false,
+    theme: 'base',
+    themeVariables: {
+        primaryColor: '#0052CC',
+        primaryTextColor: '#fff',
+        lineColor: '#DFE1E6',
+    },
+    securityLevel: 'loose',
+});
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.querySelector('.mermaid')) {
+        mermaid.run();
+    }
+});
+</script>
+{% endblock %}
+
 {% block extra_scripts %}
 <script>
 function copyArticleLink() {
