@@ -93,9 +93,23 @@
                                             <a href="{% url 'knowledge:section_detail' child.slug %}" class="nav-link nav-link--child" title="Подраздел: {{ child.name }}">
                                                 {{ child.icon|default:'▸' }} {{ child.name }}
                                             </a>
+                                            {% with child_articles=child.articles.all %}
+                                                {% if child_articles %}
+                                                    {% for art in child_articles|slice:":5" %}
+                                                        <a href="{% url 'knowledge:article_detail' art.slug %}" class="nav-link nav-link--article" title="{{ art.title }}">{{ art.title|truncatechars:40 }}</a>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endwith %}
                                         {% endif %}
                                     {% endfor %}
                                 {% endif %}
+                                {% with section_articles=section.articles.all %}
+                                    {% if section_articles %}
+                                        {% for art in section_articles|slice:":5" %}
+                                            <a href="{% url 'knowledge:article_detail' art.slug %}" class="nav-link nav-link--article" title="{{ art.title }}">{{ art.title|truncatechars:40 }}</a>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endwith %}
                             </li>
                         {% empty %}
                             <li class="nav-empty">Нет разделов</li>

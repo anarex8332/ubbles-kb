@@ -1,13 +1,15 @@
 from .models import Section, Notification, Article
 
 
+from django.db.models import Prefetch
+
 def sections_processor(request):
     """Добавляет разделы, недавние статьи, закладки и уведомления в контекст всех шаблонов"""
-    sections = Section.objects.filter(is_active=True).filter(parent__isnull=True).prefetch_related('children')
+    articles_prefetch = Prefetch('articles', queryset=Article.objects.filter(status='published').order_by('-updated_at'))
+    sections = Section.objects.filter(is_active=True).filter(parent__isnull=True).prefetch_related('children').prefetch_related(articles_prefetch)
     
     ctx = {
         'nav_sections': sections,
-        'nav_articles': Article.objects.filter(status='published').order_by('-updated_at')[:5],
     }
     
     if request.user.is_authenticated:
