@@ -1,68 +1,68 @@
 # RUBBLES KB — База знаний
 
-## Деплой на PythonAnywhere (бесплатно)
+Приложение Django для создания и управления корпоративной базой знаний (KB).
 
-### 1. Зарегистрируйтесь на PythonAnywhere
-https://www.pythonanywhere.com — кнопка **"Create a Beginner Account"** (бесплатно, без карты).
+## Деплой на Render.com (бесплатно)
 
-### 2. Откройте консоль Bash
-Нажмите **Consoles** → **Bash**.
+### 1. Зарегистрируйтесь на Render.com
+- Перейдите на https://render.com
+- Нажмите **Get Started** → зарегистрируйтесь через GitHub
+- **Карта НЕ нужна** для бесплатного тарифа
 
-### 3. Склонируйте репозиторий и установите зависимости
+### 2. Создайте новый Web Service
+- В панели Render нажмите **New +** → **Web Service**
+- Выберите репозиторий: **anarex8332/ubbles-kb**
+- Настройте:
+  - **Name:** `rubbles-kb` (или любое другое)
+  - **Runtime:** `Python 3`
+  - **Build Command:** `pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate`
+  - **Start Command:** `gunicorn config.wsgi:application --bind 0.0.0.0:$PORT`
+
+### 3. Настройте переменные окружения
+В разделе **Environment** добавьте:
+
+| Key | Value |
+|-----|-------|
+| `DJANGO_SECRET_KEY` | любой сложный ключ (например, сгенерировать на https://djecrety.ir) |
+| `DJANGO_DEBUG` | `False` |
+| `PYTHON_VERSION` | `3.11.0` |
+
+### 4. Создайте базу данных PostgreSQL
+- В панели Render нажмите **New +** → **PostgreSQL**
+- **Name:** `rubbles-kb-db`
+- **Instance Type:** **Free**
+- После создания скопируйте **Internal Database URL**
+- Перейдите в Web Service → **Environment** → добавьте переменную:
+  - **Key:** `DATABASE_URL`
+  - **Value:** вставьте скопированный Internal Database URL
+
+### 5. Запустите деплой
+- Нажмите **Save** → **Apply**
+- Render начнёт сборку и деплой (3-5 минут)
+
+### 6. Создайте суперпользователя
+После успешного деплоя перейдите в **Shell** вашего Web Service:
+
+```bash
+python manage.py createsuperuser
+```
+
+Или через **Render Dashboard** → ваш Web Service → **Shell** → введите команду.
+
+### 7. Готово!
+Сайт будет доступен по адресу:
+```
+https://rubbles-kb.onrender.com
+```
+
+## Локальная разработка
+
 ```bash
 git clone https://github.com/anarex8332/ubbles-kb.git
 cd ubbles-kb
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-```
-
-### 4. Настройте статику и базу данных
-```bash
-python manage.py collectstatic --noinput
 python manage.py migrate
 python manage.py seed_data
-python manage.py createsuperuser
-```
-
-### 5. Настройте Web приложение
-Нажмите **Web** → **Add a new web app**:
-- Выберите **Manual configuration**
-- Python версия: **3.10**
-
-### 6. Настройте WSGI файл
-На странице Web нажмите на ссылку **"WSGI configuration file"** (под Code:).
-Удалите всё и вставьте этот код:
-
-```python
-import os
-import sys
-
-path = '/home/anarex8332/ubbles-kb'
-if path not in sys.path:
-    sys.path.append(path)
-
-os.environ['DJANGO_SETTINGS_MODULE'] = 'config.settings'
-
-from django.core.wsgi import get_wsgi_application
-application = get_wsgi_application()
-```
-
-Нажмите **Save**.
-
-### 7. Настройте Virtualenv
-Вернитесь на страницу Web. В разделе **Virtualenv** укажите:
-```
-/home/anarex8332/ubbles-kb/venv
-```
-
-### 8. Настройте Static Files
-В разделе **Static files**:
-- **URL:** `/static/`
-- **Directory:** `/home/anarex8332/ubbles-kb/staticfiles`
-
-### 9. Перезагрузите
-Нажмите зелёную кнопку **Reload**.
-
-### ✅ Готово!
-Сайт: **https://anarex8332.pythonanywhere.com**
+python manage.py runserver

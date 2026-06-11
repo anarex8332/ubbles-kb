@@ -45,16 +45,39 @@ class Command(BaseCommand):
             )
             self.stdout.write(f'  ✓ Подраздел: {data["icon"]} {data["name"]}')
 
-        # Создаем начальный changelog
+        # Создаем changelog записи
         admin = User.objects.filter(is_superuser=True).first()
-        Changelog.objects.get_or_create(
-            version='1.0.0',
-            defaults={
+
+        changelogs = [
+            {
+                'version': '1.0.0',
                 'title': 'Запуск базы знаний',
                 'description': 'Первоначальный запуск базы знаний RUBBLES Planning Force. Добавлены основные разделы и функционал управления документацией.',
-                'author': admin,
-            }
-        )
-        self.stdout.write('  ✓ Релиз: v1.0.0 — Запуск базы знаний')
+            },
+            {
+                'version': '1.1.0',
+                'title': 'Улучшения интерфейса и новый функционал',
+                'description': (
+                    '• Полный редизайн в стиле Telegram Web с новым сайдбаром, шапкой и карточками\n'
+                    '• Тёмная тема с плавным переключателем (сохраняется в localStorage)\n'
+                    '• Система уведомлений: колокольчик с red dot, @упоминания в комментариях\n'
+                    '• Emoji-пикер при добавлении комментариев\n'
+                    '• Боковая панель: секции сворачиваются/разворачиваются по клику\n'
+                    '• Увеличенная ширина контента (до 1200px)\n'
+                    '• Улучшенная мобильная версия и исправления багов'
+                ),
+            },
+        ]
+
+        for cl in changelogs:
+            Changelog.objects.get_or_create(
+                version=cl['version'],
+                defaults={
+                    'title': cl['title'],
+                    'description': cl['description'],
+                    'author': admin,
+                }
+            )
+            self.stdout.write(f'  ✓ Релиз: v{cl["version"]} — {cl["title"]}')
 
         self.stdout.write(self.style.SUCCESS('\n✅ Начальные данные успешно созданы!'))
