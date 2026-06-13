@@ -14,14 +14,10 @@ def home(request):
     recent_articles = Article.objects.filter(status='published').order_by('-updated_at')[:5]
     popular_articles = Article.objects.filter(status='published').order_by('-views_count')[:5]
     recent_changelogs = Changelog.objects.filter(is_published=True)[:3]
-    sections_with_count = Section.objects.filter(is_active=True, parent__isnull=True).annotate(
-        article_count=Count('articles', filter=Q(articles__status='published'))
-    )
     return render(request, 'knowledge/home.html', {
         'recent_articles': recent_articles,
         'recent_changelogs': recent_changelogs,
         'popular_articles': popular_articles,
-        'sections_with_count': sections_with_count,
     })
 
 
