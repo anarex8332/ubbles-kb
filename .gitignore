@@ -1,34 +1,31 @@
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-dist/
-build/
-*.egg
-.eggs/
 
+!*/migrations/__init__.pyvenv_local/
 # Django
-*.sqlite3
-staticfiles/
-media/
-
 # Environment
-.env
-.venv/
-venv/
-env/
-
 # IDE
-.idea/
-*.swp
-*.swo
-.vscode/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Migrations
 # Keep __init__.py, ignore the rest
+# Migrations
+# OS
+# Python
+*.egg
+*.egg-info/
+*.py[cod]
+*.sqlite3
+*.swo
+*.swp
 */migrations/*.py
-!*/migrations/__init__.py
+.DS_Store
+.eggs/
+.env
+.idea/
+.venv/
+.vscode/
+Thumbs.db
+__pycache__/
+build/
+dist/
+env/
+media/
+staticfiles/
+venv/
+venv_local/
