@@ -1,19 +1,27 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.contrib import messages
 from .models import Section, Article, ArticleVersion, Comment, Bookmark, RecentlyViewed, Changelog, Notification
 
 
 def home(request):
-    """Главная страница со списком последних статей и changelog'ом"""
+    """Главная страница — дашборд базы знаний"""
+    if not request.user.is_authenticated:
+        return redirect('register')
     recent_articles = Article.objects.filter(status='published').order_by('-updated_at')[:5]
+    popular_articles = Article.objects.filter(status='published').order_by('-views_count')[:5]
     recent_changelogs = Changelog.objects.filter(is_published=True)[:3]
+    sections_with_count = Section.objects.filter(is_active=True, parent__isnull=True).annotate(
+        article_count=Count('articles', filter=Q(articles__status='published'))
+    )
     return render(request, 'knowledge/home.html', {
         'recent_articles': recent_articles,
         'recent_changelogs': recent_changelogs,
+        'popular_articles': popular_articles,
+        'sections_with_count': sections_with_count,
     })
 
 
@@ -79,6 +87,11 @@ def article_create(request):
         title = request.POST.get('title', '').strip()
         content = request.POST.get('content', '').strip()
         section_id = request.POST.get('section')
+        status = request.POST.get('status', 'published')
+        allow_comments = request.POST.get('allow_comments', 'true') == 'true'
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f'CREATE ARTICLE: title={repr(title)} content_len={len(content)} section={section_id} status={status}')
         if title and content:
             article = Article.objects.create(
                 title=title,
@@ -86,6 +99,8 @@ def article_create(request):
                 content_markdown=content,
                 section_id=section_id or None,
                 author=request.user,
+                status=status,
+                allow_comments=allow_comments,
             )
             messages.success(request, 'Статья успешно создана!')
             return redirect('knowledge:article_detail', slug=article.slug)

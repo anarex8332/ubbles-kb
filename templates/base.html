@@ -95,7 +95,6 @@
                     <div class="nav-title"><i class="fas fa-folder"></i> Разделы</div>
                     {% for section in nav_sections %}
                         <div class="section-wrapper" data-section="{{ section.slug }}">
-                            <!-- SECTION HEADER — название ведёт на страницу, стрелка сворачивает -->
                             <div class="section-header">
                                 <a href="{% url 'knowledge:section_detail' section.slug %}" class="section-header__link">
                                     <span class="section-header__icon">{{ section.icon|default:'📁' }}</span>
@@ -105,7 +104,6 @@
                                     <i class="fas fa-chevron-down"></i>
                                 </button>
                             </div>
-                            <!-- SECTION CHILDREN (hidden by default) -->
                             <div class="section-children section-children--hidden">
                                 {% if section.children.active %}
                                     {% for child in section.children.all %}
@@ -143,7 +141,7 @@
 
                 {% if user.is_authenticated %}
                     <div class="section-wrapper sidebar-collapsible">
-                        <div class="section-header">
+                        <div class="section-header section-header--simple">
                             <a href="{% url 'knowledge:recently_viewed' %}" class="section-header__link">
                                 <span class="section-header__icon"><i class="fas fa-history"></i></span>
                                 <span class="section-header__name">Недавние</span>
@@ -160,7 +158,7 @@
                     </div>
 
                     <div class="section-wrapper sidebar-collapsible">
-                        <div class="section-header">
+                        <div class="section-header section-header--simple">
                             <a href="{% url 'knowledge:bookmark_list' %}" class="section-header__link">
                                 <span class="section-header__icon"><i class="fas fa-bookmark"></i></span>
                                 <span class="section-header__name">Закладки</span>
@@ -205,6 +203,7 @@
         // Функция переключения секции
         function toggleSection(wrapper, btn) {
             var children = wrapper.querySelector('.section-children');
+            if (!children) return;
             var isOpen = !children.classList.contains('section-children--hidden');
             if (isOpen) {
                 children.classList.add('section-children--hidden');
@@ -213,13 +212,15 @@
                     btn.classList.add('section-header__chevron-btn--closed');
                 }
             } else {
-                document.querySelectorAll('.section-children').forEach(function(el) {
+                // Закрываем все другие открытые секции
+                document.querySelectorAll('.section-children:not(.section-children--hidden)').forEach(function(el) {
                     el.classList.add('section-children--hidden');
                 });
-                document.querySelectorAll('.section-header__chevron-btn').forEach(function(b) {
+                document.querySelectorAll('.section-header__chevron-btn--open').forEach(function(b) {
                     b.classList.remove('section-header__chevron-btn--open');
                     b.classList.add('section-header__chevron-btn--closed');
                 });
+                // Открываем выбранную
                 children.classList.remove('section-children--hidden');
                 if (btn) {
                     btn.classList.remove('section-header__chevron-btn--closed');
@@ -228,8 +229,8 @@
             }
         }
 
-        // Стрелка ▼ для всех секций
         document.addEventListener('DOMContentLoaded', function() {
+            // Стрелка ▼ для всех секций (разделы, недавние, закладки)
             document.querySelectorAll('.section-header__chevron-btn').forEach(function(btn) {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -238,15 +239,20 @@
                 });
             });
 
-            // Клик по заголовку "Недавние" и "Закладки" — тоже переключает
-            document.querySelectorAll('.sidebar-collapsible .section-header').forEach(function(header) {
+            // Клик по заголовку раздела (кроме стрелки) — сворачивает/разворачивает
+            document.querySelectorAll('.section-header').forEach(function(header) {
                 header.addEventListener('click', function(e) {
+                    // Если кликнули по ссылке внутри заголовка — не перехватываем
+                    if (e.target.closest('a')) return;
                     if (e.target.closest('.section-header__chevron-btn')) return;
                     var wrapper = this.closest('.section-wrapper');
+                    if (!wrapper) return;
                     var btn = wrapper.querySelector('.section-header__chevron-btn');
                     toggleSection(wrapper, btn);
                 });
             });
+
+            // Ссылки внутри заголовка — обычная навигация, ничего не блокируем
         });
     </script>
     {% block extra_scripts %}{% endblock %}
