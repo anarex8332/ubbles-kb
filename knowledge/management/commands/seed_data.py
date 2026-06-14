@@ -1,4 +1,4 @@
-]from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand
 from knowledge.models import Section, Changelog
 from django.contrib.auth.models import User
 
@@ -44,6 +44,11 @@ class Command(BaseCommand):
                 defaults={'icon': data['icon'], 'parent': data['parent']}
             )
             self.stdout.write(f'  ✓ Подраздел: {data["icon"]} {data["name"]}')
+
+        # Создаём админа по умолчанию, если нет ни одного пользователя
+        if not User.objects.exists():
+            User.objects.create_superuser('admin', 'admin@rubbles.ru', 'admin123')
+            self.stdout.write('  ✓ Создан админ: admin / admin123')
 
         # Создаем changelog записи
         admin = User.objects.filter(is_superuser=True).first()
